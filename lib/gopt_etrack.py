@@ -60,13 +60,19 @@ def read_gaussian_opt(gfile):
 def print_etrack(force, scf, eigen):
     for num in sorted(scf.keys()):
         print 'Step %4d: SCF Done:  E = %16.8f'%(num,scf[num])
-        print '        Item               Value     Threshold  Converged?'
-        print 'Maximum Force            %9.6f %11.6f     %-4s'%(force[num][0],force[num][1],force[num][2])
-        print 'RMS     Force            %9.6f %11.6f     %-4s'%(force[num][3],force[num][4],force[num][5])
-        print 'Maximum Displacement     %9.6f %11.6f     %-4s'%(force[num][6],force[num][7],force[num][8])
-        print 'RMS     Displacement     %9.6f %11.6f     %-4s'%(force[num][9],force[num][10],force[num][11])
-        if len(eigen[num]) != 0:
+        if num in force.keys():
+            print '        Item               Value     Threshold  Converged?'
+            print 'Maximum Force            %9.6f %11.6f     %-4s'%(force[num][0],force[num][1],force[num][2])
+            print 'RMS     Force            %9.6f %11.6f     %-4s'%(force[num][3],force[num][4],force[num][5])
+            print 'Maximum Displacement     %9.6f %11.6f     %-4s'%(force[num][6],force[num][7],force[num][8])
+            print 'RMS     Displacement     %9.6f %11.6f     %-4s'%(force[num][9],force[num][10],force[num][11])
+        else:
+            print 'Step %d has no force value yet!'%num
+        if num in eigen.keys() and len(eigen[num]) != 0:
             print 'Eigenvalues of step %4d: '%(num), tuple(eigen[num])
+        else:
+            print 'Step %d has no Eigenvalues yet!'%num
+
 
 
 def write_etrack(force, scf, eigen):
@@ -74,13 +80,13 @@ def write_etrack(force, scf, eigen):
     for num in sorted(scf.keys()):
         efile.write('Step %4d: '%(num))
         efile.write('SCF Done:  E = %16.8f\n'%scf[num])
-        if len(force[num]) != 0:
+        if num in force.keys() and len(force[num]) != 0:
             efile.write('        Item               Value     Threshold  Converged?\n')
             efile.write('Maximum Force            %9.6f %11.6f     %-4s\n'%(force[num][0],force[num][1],force[num][2]))
             efile.write('RMS     Force            %9.6f %11.6f     %-4s\n'%(force[num][3],force[num][4],force[num][5]))
             efile.write('Maximum Displacement     %9.6f %11.6f     %-4s\n'%(force[num][6],force[num][7],force[num][8]))
             efile.write('RMS     Displacement     %9.6f %11.6f     %-4s\n'%(force[num][9],force[num][10],force[num][11]))
-        if len(eigen[num]) != 0:
+        if num in eigen.keys() and len(eigen[num]) != 0:
             efile.write('Eigenvalues of step %4d:'%(num))
             for eigen_vl in eigen[num]:
                 efile.write('%11.5f'%eigen_vl)
@@ -92,4 +98,4 @@ if __name__ == '__main__':
     output = sys.argv[1]
     opt, force, scf, eigen = read_gaussian_opt(output)
     print_etrack(force,scf,eigen)
-    write_etrack(force,scf,eigen)
+#    write_etrack(force,scf,eigen)
