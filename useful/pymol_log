@@ -1,0 +1,189 @@
+load C:/Users/qcheng1/Documents/Projects/dd-peptidase/manuscript/final-gas.pse
+unset opaque_background
+ray
+cmd.enable('all')
+select rr, /all//A/60+61+63+64+120+161+233+237+238+285+298+299+300+301
+set_bond stick_transparency, 0.6, rr
+ray
+set stick_ball_ratio, 1.5
+set stick_ball, on
+show stick
+set stick_radius, 0.15
+color red, name o*
+color blue, name n*
+color grey, name c*
+color yellow, name S
+color yellow, name S1
+cmd.disable('rr')
+ray
+cmd.disable('all')
+cmd.enable('ts001-irc2-1',1)
+cmd.disable('ts001-irc2-1')
+cmd.enable('ts001-ts-2',1)
+cmd.enable('ts001-irc2-1',1)
+ray 2400, 2400
+ray 2400, 2400
+cmd.disable('ts001-ts-2')
+ray 2400, 2400
+cmd.enable('all')
+set_bond stick_transpanency, 0.5, rr
+cmd.disable('all')
+cmd.enable('ts001-irc2-1',1)
+ray 2400, 2400
+cmd.enable('all')
+set_bond stick_transpanency, 0.4, rr
+set_bond stick_transparency, 0.5, rr
+cmd.disable('all')
+cmd.enable('ts001-irc2-1',1)
+ray 2400, 2400
+ray 2400, 2400
+ray 2400, 2400
+png gas1.png
+ray 2400, 2400
+png gas1.png
+cmd.disable('ts001-irc2-1')
+cmd.enable('ts001-ts-2',1)
+cmd.enable('ts001-irc2-1',1)
+cmd.enable('ts001-irc1-3',1)
+cmd.disable('ts001-irc2-1')
+cmd.disable('ts001-ts-2')
+cmd.disable('ts001-irc1-3')
+cmd.enable('ts001-irc2-1',1)
+cmd.enable('ts001-ts-2',1)
+cmd.enable('ts001-irc1-3',1)
+cmd.enable('ts002-ts-4',1)
+cmd.disable('ts001-irc2-1')
+cmd.disable('ts001-ts-2')
+cmd.disable('ts001-irc1-3')
+cmd.enable('ts001-ts-2',1)
+cmd.disable('ts002-ts-4')
+cmd.disable('ts001-ts-2')
+cmd.enable('ts002-ts-4',1)
+cmd.disable('ts002-ts-4')
+cmd.enable('ts002-irc2-5',1)
+cmd.enable('ts002-ts-4',1)
+cmd.disable('ts002-ts-4')
+cmd.disable('ts002-irc2-5')
+cmd.enable('ts004-irc1-7',1)
+cmd.enable('ts002-irc2-5',1)
+cmd.disable('ts002-irc2-5')
+cmd.enable('ts004-ts-8',1)
+cmd.disable('ts004-irc1-7')
+cmd.enable('ts004-irc2-9',1)
+cmd.disable('ts004-ts-8')
+cmd.enable('ts004-ts-8',1)
+cmd.enable('ts005-ts-10',1)
+cmd.disable('ts004-irc2-9')
+cmd.disable('ts004-ts-8')
+cmd.disable('ts005-ts-10')
+cmd.enable('ts005-irc1-11',1)
+cmd.enable('ts004-ts-8',1)
+cmd.disable('ts004-ts-8')
+cmd.disable('ts005-irc1-11')
+cmd.enable('ts006-ts-12',1)
+cmd.disable('ts006-ts-12')
+cmd.enable('ts006-irc1-13',1)
+cmd.disable('ts006-irc1-13')
+cmd.enable('ts007-ts-14',1)
+cmd.disable('ts007-ts-14')
+cmd.enable('ts007-irc1-15',1)
+cmd.disable('ts007-irc1-15')
+cmd.enable('ts001-irc2-1',1)
+ray 2400, 2400
+png gas1.png
+cmd.disable('ts001-irc2-1')
+cmd.enable('ts001-ts-2',1)
+ray 2400, 2400
+png gas2.png
+cmd.disable('ts001-ts-2')
+cmd.enable('ts001-irc1-3',1)
+ray 2400, 2400
+png gas3.png
+cmd.disable('ts001-irc1-3')
+cmd.enable('ts002-ts-4',1)
+ray 2400, 2400
+png gas4.png
+cmd.enable('ts002-irc2-5',1)
+cmd.disable('ts002-ts-4')
+ray 2400, 2400
+png gas5.png
+cmd.disable('ts002-irc2-5')
+cmd.enable('ts004-irc1-7',1)
+ray 2400, 2400
+png gas7.png
+cmd.disable('ts004-irc1-7')
+cmd.enable('ts004-ts-8',1)
+ray 2400, 2400
+png gas8.png
+cmd.disable('ts004-ts-8')
+cmd.enable('ts004-irc2-9',1)
+ray 2400, 2400
+png gas9.png
+cmd.disable('ts004-irc2-9')
+cmd.enable('ts005-ts-10',1)
+ray 2400, 2400
+png gas10.png
+cmd.disable('ts005-ts-10')
+cmd.enable('ts005-irc1-11',1)
+ray 2400, 2400
+png gas11.png
+cmd.disable('ts005-irc1-11')
+cmd.enable('ts006-ts-12',1)
+ray 2400, 2400
+png gas12.png
+cmd.disable('ts006-ts-12')
+cmd.enable('ts006-irc1-13',1)
+ray 2400, 2400
+png gas13.png
+cmd.enable('ts007-ts-14',1)
+cmd.disable('ts006-irc1-13')
+ray 2400, 2400
+png gas14.png
+cmd.disable('ts007-ts-14')
+cmd.enable('ts007-irc1-15',1)
+ray 2400, 2400
+png gas15.png
+save C:/Users/qcheng1/Documents/Projects/dd-peptidase/manuscript/final-gas.pse,format=pse
+cmd.save('''C:/Users/qcheng1/Documents/Projects/dd-peptidase/manuscript/final-gas.pse''','','pse',quiet=0)
+cmd.set('session_changed',0)
+cmd.enable('all')
+cmd.enable('rr')
+cmd.hide("sticks"    ,"rr")
+cmd.disable('rr')
+cmd.disable('all')
+cmd.enable('ts001-irc2-1',1)
+ray 2400, 2400
+cmd.hide("lines"     ,"rr")
+cmd.show("lines"     ,"rr")
+cmd.enable('all')
+set_bond line_transparency, 0.5, rr
+set transparency, 0.5, rr
+cmd.disable('all')
+cmd.enable('ts001-irc2-1',1)
+ray 2400, 2400
+png test1.png
+cmd.disable('ts001-irc2-1')
+cmd.enable('ts007-irc1-15',1)
+bond /ts007-irc1-15//A/PNM/C7, /ts007-irc1-15//A/HOH`1040/O
+cmd.edit("(ts007-irc1-15`231)",None,None,None,pkresi=0,pkbond=0)
+cmd.get_wizard().do_pick(0)
+cmd.edit("(ts007-irc1-15`231)","(ts007-irc1-15`266)",None,None,pkresi=0,pkbond=0)
+cmd.get_wizard().do_pick(0)
+cmd.edit("(ts007-irc1-15`255)",None,None,None,pkresi=0,pkbond=0)
+cmd.get_wizard().do_pick(0)
+cmd.set_wizard()
+save C:/Users/qcheng1/Documents/Projects/dd-peptidase/manuscript/ts007-irc1-15.pdb,((ts007-irc1-15))
+ray 2400, 2400
+ray 2400, 2400
+cmd.show("sticks"    ,"ts007-irc1-15")
+ray 2400, 2400
+ray 2400, 2400
+cmd.select('sele','none')
+cmd.select('sele',"byresi((((sele) or byresi((ts007-irc1-15`259))) and not ((byresi((ts007-irc1-15`259))) and byresi(sele))))",enable=1)
+cmd.disable('sele')
+ray 2400, 2400
+ray 2400, 2400
+png gas15.png
+save C:/Users/qcheng1/Documents/Projects/dd-peptidase/manuscript/final-gas.pse,format=pse
+cmd.save('''C:/Users/qcheng1/Documents/Projects/dd-peptidase/manuscript/final-gas.pse''','','pse',quiet=0)
+cmd.set('session_changed',0)
