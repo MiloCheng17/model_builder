@@ -10,6 +10,7 @@ def read_gaussian_opt(gfile):
     with open(gfile) as f:
         lines = f.readlines()
     natoms = 0
+    nimag = 0
     for i in range(len(lines)):
         l = lines[i]
         if "Standard orientation:" in l:
@@ -23,8 +24,10 @@ def read_gaussian_opt(gfile):
             break
     for i in range(len(lines)):
         l = lines[i]
-        if "NImag" in l:
-            nimag = int( l.split('NImag')[1].split('\\\\')[0][1:] )
+        if "NImag" in l and len(l.split('NImag')[1].split('\\')[0].split()) >= 1 and "NImag" not in l[-7:]:
+            nimag = int( l.split('NImag')[1].split('\\')[0][1:] )
+#        else:
+#            nimag = int( lines[i+1]
         if "NBasis" in l:
             nbasis = int( l.split()[1] )
         if "SCF Done" in l:

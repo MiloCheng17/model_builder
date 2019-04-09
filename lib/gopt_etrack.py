@@ -98,4 +98,4 @@ if __name__ == '__main__':
     output = sys.argv[1]
     opt, force, scf, eigen = read_gaussian_opt(output)
     print_etrack(force,scf,eigen)
-#    write_etrack(force,scf,eigen)
+    write_etrack(force,scf,eigen)
