@@ -157,7 +157,7 @@ if __name__ == '__main__':
 
     ### Need to add more type of calculation basis sets etc. ###
 
-    input = open('%d.input'%count,'w')
+    input = open('%s.input'%count,'w')
     input.write("%chk=1.chk\n")     #write check file into 1.chk
     input.write("%nproc=10\n")      #use 24 processors
     input.write("%mem=3800MB\n")      #use memory
@@ -167,7 +167,7 @@ if __name__ == '__main__':
     title = raw_input("Input the descriptive name of this calculation: ")
     input.write("%s\n"%title)
     input.write("\n")
-    print "total charge is %d" %tot_charge
+    print "total charge is %d, please double check!!" %tot_charge    # charge needs to be checked #
     input.write("%d 1\n"%(tot_charge))        #charge and multiplicity, also need to be changed case by case
     
     

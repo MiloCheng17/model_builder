@@ -115,7 +115,7 @@ if __name__ == '__main__':
         print "Usage write_input.py final_i.pdb project_dir"
         exit()
     tmppdb = sys.argv[1]
-    count = int(tmppdb[:-4].split('_')[1])
+    count = str(tmppdb[:-4].split('_')[1])
     project_dir = sys.argv[2]
     dirf = '%s/model%s-ts-001'%(project_dir,count)
     with open('%s/1.inp'%dirf) as f:
@@ -139,12 +139,12 @@ if __name__ == '__main__':
     os.chdir('%s'%work_dir)
     input = open('1.inp','w')
     input.write("%chk=1.chk\n")     #write check file into 1.chk
-    input.write("%nproc=20\n")      #use 24 processors
-    input.write("%mem=14GB\n")      #use memory
+    input.write("%nproc=10\n")      #use 24 processors
+    input.write("%mem=3800MB\n")      #use memory
     
     input.write("#P b3lyp/genecp opt(ts,noeigen,calcfc) freq scf=(xqc,maxcon=128,maxcyc=128)\n")      #many things can be changed to user input
     input.write("\n")
-    input.write("%d\n"%count)
+    input.write("%s\n"%count)
     input.write("\n")
     input.write("%s 1\n"%charge)        #charge and multiplicity, also need to be changed case by case
     

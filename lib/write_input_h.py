@@ -117,10 +117,10 @@ def write_pdb(filename,pdb,renum_atom=True,hydrogen=True,renum_res=False):
 def write_input(tmp_input,charge,pic_atom,tot_charge):
     with open(tmp_input) as f:
         lines = f.readlines()
-    input = open('%d.input'%count,'w')
+    input = open('%s.input'%count,'w')
     input.write("%chk=1.chk\n")     #write check file into 1.chk
-    input.write("%nproc=24\n")      #use 24 processors
-    input.write("%mem=14GB\n")      #use memory
+    input.write("%nproc=10\n")      #use 24 processors
+    input.write("%mem=3800MB\n")      #use memory
     
     input.write("#P b3lyp/gen opt freq scf=(xqc,maxcon=128,maxcyc=128)\n")      #many things can be changed to user input
     input.write("\n")
@@ -150,9 +150,9 @@ if __name__ == '__main__':
         print "Usage ~/projects/model_build/lib-2018/write_input.py template.pdb H-added.pdb"
         exit()
     tmppdb = sys.argv[1]
-    count = int(tmppdb[:-4].split('_')[1])
+    count = str(tmppdb[:-4].split('_')[1])
     newpdb = sys.argv[2]
-    outf = 'final_%d.pdb'%count
+    outf = 'final_%s.pdb'%count
 
     tmp_pdb, res_info, tot_charge_t = read_pdb(tmppdb)
     tmp_xyz = []
@@ -187,7 +187,7 @@ if __name__ == '__main__':
 
     ### Need to add more type of calculation basis sets etc. ###
 
-    input = open('%d.input'%count,'w')
+    input = open('%s.input'%count,'w')
     input.write("%chk=1.chk\n")     #write check file into 1.chk
     input.write("%nproc=10\n")      #use 24 processors
     input.write("%mem=3800MB\n")      #use memory
@@ -196,7 +196,7 @@ if __name__ == '__main__':
     input.write("#P pm6 opt(calcfc) scf=(xqc,maxcon=128,maxcyc=128)\n")      #many things can be changed to user input
 #    input.write("#P pm6 opt scf=(xqc,maxcon=128,maxcyc=128)\n")      #many things can be changed to user input
     input.write("\n")
-    input.write("%d\n"%count)
+    input.write("%s\n"%count)
     input.write("\n")
     input.write("%d 1\n"%(1+tot_charge))        #charge and multiplicity, also need to be changed case by case
     
