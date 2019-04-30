@@ -79,7 +79,7 @@ def read_pdb(pdbfile,TER=False):
         pdb.append( [ record, serial, atomname, altloc, resname, chain, resnum, achar, x, y, z, occ, tfactor, segid, elsymbol, charge, fix ] )
         #     1          0       1       2       3       4           5   6       7      8  9  10 11   12         13      14      15      16
     f.close()
-    return pdb, res_info
+    return pdb, res_info, tot_charge
 
 
 
@@ -125,11 +125,11 @@ if __name__ == '__main__':
     newpdb = sys.argv[2]
     outf = 'final_%s.pdb'%count
 
-    tmp_pdb, res_info = read_pdb(tmppdb)
+    tmp_pdb, res_info, tot_charge_t = read_pdb(tmppdb)
     tmp_xyz = []
     for i in tmp_pdb:
         tmp_xyz.append([i[8],i[9],i[10]])
-    new_pdb, binfo = read_pdb(newpdb)     #can be just xyz files from cerius or pymol
+    new_pdb, binfo, tot_charge = read_pdb(newpdb)     #can be just xyz files from cerius or pymol
     pic_atom = []
     xyz = []
     atom = []
