@@ -13,6 +13,7 @@ def read_pdb(pdbfile,TER=False):
     f = open(pdbfile,'r')
     pdb = []
     res_info = []
+    tot_charge = 0
     for line in f:
         record = line[:6]
         if ( record != 'ATOM  ' and record != 'HETATM' ): continue
@@ -68,6 +69,12 @@ def read_pdb(pdbfile,TER=False):
                 res_info.append([atomname, chain, resnum])
         except:
             fix = " 0"
+        if '+' in charge:
+            tot_charge += int(charge[0])    
+        elif '-' in charge:
+            tot_charge -= int(charge[0])
+        else:
+            tot_charge += 0
             
         pdb.append( [ record, serial, atomname, altloc, resname, chain, resnum, achar, x, y, z, occ, tfactor, segid, elsymbol, charge, fix ] )
         #     1          0       1       2       3       4           5   6       7      8  9  10 11   12         13      14      15      16
@@ -111,12 +118,12 @@ def write_pdb(filename,pdb,renum_atom=True,hydrogen=True,renum_res=False):
 if __name__ == '__main__':
 
     if len(sys.argv) < 3:
-        print "Usage ~/projects/model_build/lib-2018/write_input.py template.pdb H-added.pdb"
+        print "Usage write_input.py template.pdb H-added.pdb"
         exit()
     tmppdb = sys.argv[1]
-    count = int(tmppdb[:-4].split('_')[1])
+    count = str(tmppdb[:-4].split('_')[1])
     newpdb = sys.argv[2]
-    outf = 'final_%d.pdb'%count
+    outf = 'final_%s.pdb'%count
 
     tmp_pdb, res_info = read_pdb(tmppdb)
     tmp_xyz = []
@@ -160,7 +167,8 @@ if __name__ == '__main__':
     title = raw_input("Input the descriptive name of this calculation: ")
     input.write("%s\n"%title)
     input.write("\n")
-    input.write("1 1\n")        #charge and multiplicity, also need to be changed case by case
+    print "total charge is %d" %tot_charge
+    input.write("%d 1\n"%(tot_charge))        #charge and multiplicity, also need to be changed case by case
     
     
     for i in range(len(pic_atom)):
