@@ -144,8 +144,8 @@ if __name__ == '__main__':
     os.chdir('%s'%dirf)
     input = open('1.inp','w')
     input.write("%chk=1.chk\n")     #write check file into 1.chk
-    input.write("%nproc=20\n")      #use 24 processors
-    input.write("%mem=7800MB\n")      #use memory
+    input.write("%nprocshared=10\n")      #use 24 processors
+    input.write("%mem=80GB\n")      #use memory
     
 #    input.write("#P b3lyp/genecp opt(ts,noeigen,calcfc) freq scf=(xqc,maxcon=128,maxcyc=128)\n")      #many things can be changed to user input
     input.write("#P b3lyp/genecp opt(modred) scf=(xqc,maxcon=128,maxcyc=128)\n")      #many things can be changed to user input
