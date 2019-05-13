@@ -1,14 +1,19 @@
 #!/usr/bin/env python
 
-import os, sys, re
+import os, sys, re, filecmp
 from numpy import *
-from read_probe import *
+import argparse
+from glob import glob
 
 
-### /home/ndyonker/chem/comt/model-trang/comt-m2-ts-001 ###
-### /home/ndyonker/chem/comt/make_pdb ###
-
-
+def system_run(cmd):
+    print cmd
+    exit = os.system(cmd)
+    if ( exit != 0 ):
+        print 'failed to run:'
+        print cmd
+        sys.exit()
+ 
 def read_pdb(pdbfile,TER=False):
     f = open(pdbfile,'r')
     pdb = []
@@ -43,10 +48,10 @@ def read_pdb(pdbfile,TER=False):
             elsymbol = line[76:78]
         except:
             elsymbol = ''
-        try:
-            charge = line[78:80]
+        try: 
+            charge =  line[78:80] 
         except:
-            charge = '0 '
+            charge = '0.'
         # 0:  record
         # 1:  serial
         # 2:  atomname
@@ -81,8 +86,6 @@ def read_pdb(pdbfile,TER=False):
     f.close()
     return pdb, res_info, tot_charge
 
-
-
 def write_pdb(filename,pdb,renum_atom=True,hydrogen=True,renum_res=False):
     if ( isinstance(filename,file) ):
         f = filename
@@ -113,72 +116,218 @@ def write_pdb(filename,pdb,renum_atom=True,hydrogen=True,renum_res=False):
     if ( file_opened ):
         f.close()
 
-
-
-if __name__ == '__main__':
-
-    if len(sys.argv) < 3:
-        print "Usage write_input.py template.pdb H-added.pdb"
-        exit()
-    tmppdb = sys.argv[1]
-    count = str(tmppdb[:-4].split('_')[1])
-    newpdb = sys.argv[2]
-    outf = 'final_%s.pdb'%count
-
+### copy h-added pdb xyz and other information into tmppdb ###
+def pdb_after_addh(tmppdb,newpdb):
     tmp_pdb, res_info, tot_charge_t = read_pdb(tmppdb)
     tmp_xyz = []
     for i in tmp_pdb:
         tmp_xyz.append([i[8],i[9],i[10]])
     new_pdb, binfo, tot_charge = read_pdb(newpdb)     #can be just xyz files from cerius or pymol
     pic_atom = []
-    xyz = []
-    atom = []
-    hold = []
     for line in new_pdb:
-        xyz.append([line[8],line[9],line[10]])
         if [line[8],line[9],line[10]] not in tmp_xyz:
-            atom.append(' H')
+            line[15] = '0 '
             pic_atom.append([line[0],line[1],line[2],line[3],line[4],line[5],line[6],line[7],line[8],line[9],line[10],line[11],line[12],line[13],' H',line[15],line[16]])
-            #pic_atom.append([line[0],line[1],'H',line[3],line[4],line[5],line[6],line[7],line[8],line[9],line[10],line[11],line[12],line[13],' H',line[15],line[16]])
-            hold.append(0)
         else:
+            if '+' in line[15] or '-' in line[15]:
+                charge = line[15]
+            else:
+                charge = '0 '
             idx = tmp_xyz.index([line[8],line[9],line[10]])
-            #line[14] = tmp_pdb[idx][14]
             line = tmp_pdb[idx]
-            atom.append(line[14])
+            line[15] = charge
             if [line[2],line[5],line[6]] in res_info:
                 pic_atom.append([line[0],line[1],line[2],line[3],line[4],line[5],line[6],line[7],line[8],line[9],line[10],line[11],line[12],line[13],line[14],line[15],'-1'])
-                hold.append(-1)
             else:
                 pic_atom.append([line[0],line[1],line[2],line[3],line[4],line[5],line[6],line[7],line[8],line[9],line[10],line[11],line[12],line[13],line[14],line[15],line[16]])
-                hold.append(0)
-    
-    write_pdb(outf,pic_atom)
+    return pic_atom, tot_charge #, xyz, atom, hold
 
-    ### Need to add more type of calculation basis sets etc. ###
+def write_input(inp_name,inp_temp,charge,multiplicity,pic_atom,tot_charge):
+    ### inp_name default can be 1.inp, but first is name.input such as 9.input
+    ### inp_type list which includes [small/large, level_theory, basis, opt, freq,  
+    ### input_template line0: size
+    ### input_template line1: level
+    ### input_template line2: opt + calcfc/readfc or opt + modred + info
+    ### input_template line3: freq
+    ### input_template line4: guess=read
+    ### input_template line5: geom=checkpoint
+    ### input_template line6: iop
+    ### input_template line7: scf_info
+    ### input_template line8: scrf_info
 
-    input = open('%s.input'%count,'w')
-    input.write("%chk=1.chk\n")     #write check file into 1.chk
-    input.write("%nprocshared=10\n")      #use 24 processors
-    input.write("%mem=20GB\n")      #use memory
+    with open(inp_temp) as f:
+        lines = f.readlines()
+
+    inp = open('%s'%inp_name,'w')
+    inp.write("%chk=1.chk\n")           #write check file into 1.chk
+    inp.write("%nprocshared=10\n")      #use 10 processors
+
+    if 'small' in lines[0]:
+        inp.write("%mem=20GB\n")        #use memory if it is large job use 80GB
+    else:
+        inp.write("%mem=80GB\n")
     
-    input.write("#P b3lyp/gen opt freq scf=(xqc,maxcon=128,maxcyc=128)\n")      #many things can be changed to user input
-    input.write("\n")
-    title = raw_input("Input the descriptive name of this calculation: ")
-    input.write("%s\n"%title)
-    input.write("\n")
-    print "total charge is %d, please double check!!" %tot_charge    # charge needs to be checked #
-    input.write("%d 1\n"%(tot_charge))        #charge and multiplicity, also need to be changed case by case
+    inp.write("#P %s "%lines[1].strip())      
+    if bool(lines[2].strip()):
+        optl = lines[2].split()
+    inp.write("%s "%optl[0])
+    if 'modred' in lines[2]:
+        f_atom = []
+        modred_info, modred_code = optl[1:3]
+        pairs = modred_info.split(';')
+        lmod = []
+        for pair in pairs:
+            ar = pair.split(',')
+            lmod.append(len(ar)/2)
+            for i in range(0,len(ar),2):
+                for atom in pic_atom:
+                    if ar[i] in atom[2] and ar[i+1] in atom[4]:
+                        f_atom.append(pic_atom.index(atom)+1)
+    for l in range(3,9):
+        if bool(lines[l].strip()):
+            inp.write("%s "%lines[l].strip())
+
+    inp.write("\n\n")
+    inp.write("info_line\n")
+    inp.write("\n")
+    inp.write("%d %d\n"%(charge+tot_charge,multiplicity))
+
+    if 'check' not in lines[5]:
+        ### pm7 with opt only will be relax h step/ pm7 with opt(modred) otherwise
+        if 'pm7' in lines[1] and lines[2].strip() == 'opt':
+            for atom in pic_atom:
+                if atom[14].strip() == 'H':
+                    inp.write("%4s %6s         %8.3f %8.3f %8.3f\n"%(atom[14].strip(),'0',atom[8],atom[9],atom[10])) 
+                else:
+                    inp.write("%4s %6s         %8.3f %8.3f %8.3f\n"%(atom[14].strip(),'-1',atom[8],atom[9],atom[10])) 
+        else:
+            for atom in pic_atom:
+                inp.write("%4s %6s         %8.3f %8.3f %8.3f\n"%(atom[14].strip(),atom[16],atom[8],atom[9],atom[10])) 
+    inp.write("\n")
+
+    count = 0
+    if 'modred' in lines[2]:
+        for l in lmod:
+            for i in range(l):
+                inp.write("%d "%f_atom[count+i])
+            inp.write("%s\n"%modred_code)
+            count += l
+        inp.write("\n")
+
+    if 'basis' in lines[10]:
+        for l in lines[11:]:
+            inp.write("%s"%l)
+        inp.write('\n')
+
+    if 'scrf' in lines[8]:
+        inp.write('radii=uff\nalpha=1.2\neps=4.0\n\n')
     
-    
-    for i in range(len(pic_atom)):
-        input.write("%4s %6s %8.3f %8.3f %8.3f\n"%(atom[i],hold[i],xyz[i][0],xyz[i][1],xyz[i][2])) 
-    
-    input.write("\n")
-    input.write("O N S\n")
-    input.write("6-31G(d')\n")
-    input.write("****\n")
-    input.write("C H\n")
-    input.write("6-31G\n")
-    input.write("****\n")
-    input.write("\n")
+    inp.close()
+
+
+def gen_pdbfiles(wdir,step,tmppdb):
+    new_dir = '%s/step%spdbs'%(wdir,step)
+    if os.path.isdir(new_dir):
+        system_run('rm -r %s'%new_dir)
+        system_run('mkdir %s'%new_dir)
+    else:
+        system_run('mkdir %s'%new_dir)
+    os.chdir(new_dir)
+    system_run('gopt_to_pdb.py %s %s/step-%s-out 0'%(tmppdb,wdir,step))
+    os.chdir('%s'%wdir)
+    pdb_name = []
+    for pdbf in glob('%s/*.pdb'%new_dir):
+        m = re.search('(\d+).pdb',pdbf)
+        pdb_name.append( int(m.group(1)) )
+    return max(pdb_name), new_dir
+
+
+if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser(description='Prepare template PDB files, write input files, save output PDB files in working directory')
+    parser.add_argument('-step', dest='step', default=0, type=int, 
+    help='step0: read noh, addh pdbs, write_final_pdb and read input_template write_first_inp,\
+          step1: read outputwrite_modred_inp, input_template, write_second_inp,\
+          step2: read outputwrite_modred_inp, input_template, write_new_inp')
+    parser.add_argument('-wdir', dest='output_dir', default=os.path.abspath('./'), help='working dir')
+    parser.add_argument('-tmp', dest='tmp_pdb', default=None, help='template_pdb_file')
+    parser.add_argument('-noh', dest='no_h_pdb', default=None, help='trimmed_pdb_file')
+    parser.add_argument('-adh', dest='h_add_pdb', default=None, help='hadded_pdb_file')
+    parser.add_argument('-new', dest='new_pdb', default=None, help='new_pdb_file')
+    parser.add_argument('-intmp', dest='input_tmp', default=None, help='template_for_write_input')
+    parser.add_argument('-outf', dest='gau_out', default='1.out', help='output_name')
+    parser.add_argument('-inpn', dest='inp_name', default='1.inp', help='input_name')
+    parser.add_argument('-m', dest='multiplicity', default=1, type=int, help='multiplicity')
+    parser.add_argument('-c', dest='lig_charge', default=0, type=int, help='charge_of_ligand')
+
+    args = parser.parse_args()
+
+    step = args.step
+    wdir = args.output_dir
+    if args.tmp_pdb is None:
+        tmp_pdb = '%s/template.pdb'%wdir
+    else:
+        tmp_pdb   = args.tmp_pdb
+
+#    i_name = []
+#    for gau_input in glob('%s/*'%wdir):
+#        m = re.search(r'-(\d+)-inp', gau_input)
+#        if m:
+#            i_name.append( int(m.group(1)) )
+#    if len(i_name) > 0:
+#        step = max(i_name)
+#        if filecmp.cmp('1.inp','%s/step-%s-inp'%(wdir,step)) is False and filecmp.cmp('1.out','%s/step-%s-out'%(wdir,step)) is False:
+#            system_run( 'cp 1.inp step-%s-inp'%(step+1) )
+#            system_run( 'cp 1.out step-%s-out'%(step+1) )
+#            system_run( 'cp 1.chk step-%s-chk'%(step+1) )
+#        else:
+#            print "check if the files are propagated correctly!"
+#        for n in sorted(i_name):
+#            pdb_file = gen_pdbfiles(wdir,n,tmppdb)
+            
+    nohpdb   = args.no_h_pdb
+    adhpdb   = args.h_add_pdb
+#    newpdb   = args.new_pdb
+    int_tmp  = args.input_tmp
+    gauout   = args.gau_out
+    inp_name = args.inp_name
+    multi    = args.multiplicity
+    charge   = args.lig_charge
+    wdir     = args.output_dir
+
+    if step == 0:
+        pic_atom, tot_charge = pdb_after_addh(nohpdb,adhpdb)
+        write_pdb('%s'%tmp_pdb,pic_atom)
+    elif step == 1:
+        i_name = []
+        for gau_input in glob('%s/*inp'%wdir):
+            m = re.search(r'-(\d+)-inp', gau_input)
+            if m:
+                i_name.append( int(m.group(1)) )
+        if len(i_name) == 0:
+            i_step = 1
+            system_run( 'cp 1.inp step-%s-inp'%(i_step) )
+            system_run( 'cp 1.out step-%s-out'%(i_step) )
+            system_run( 'cp 1.chk step-%s-chk'%(i_step) )
+        else:
+            i_step = max(i_name)
+            if filecmp.cmp('1.inp','%s/step-%s-inp'%(wdir,i_step)) is False and filecmp.cmp('1.out','%s/step-%s-out'%(wdir,i_step)) is False:
+                i_step += 1
+                system_run( 'cp 1.inp step-%s-inp'%(i_step) )
+                system_run( 'cp 1.out step-%s-out'%(i_step) )
+                system_run( 'cp 1.chk step-%s-chk'%(i_step) )
+            elif filecmp.cmp('1.inp','%s/step-%s-inp'%(wdir,i_step)) is True and filecmp.cmp('1.out','%s/step-%s-out'%(wdir,i_step)) is True:
+                i_step = i_step
+            else:
+                print "check if the files are propagated correctly!"
+                sys.exit()
+#            for n in sorted(i_name):
+#                pdb_file, new_dir = gen_pdbfiles(wdir,n,tmp_pdb)
+        pdb_file, new_dir = gen_pdbfiles(wdir,i_step,tmp_pdb)
+
+        pic_atom, res_info, tot_charge = read_pdb('%s/%s.pdb'%(new_dir,pdb_file))
+    elif step == 2:
+        newpdb = args.new_pdb
+        pic_atom, res_info, tot_charge = read_pdb(newpdb)
+    write_input('%s/%s'%(wdir,inp_name),int_tmp,charge,multi,pic_atom,tot_charge)
+        
