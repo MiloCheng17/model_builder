@@ -27,7 +27,7 @@ def read_gaussian_opt(gfile):
         if 'SCF Done' in lines[i]:
             count += 1
             scf[count] = (float(lines[i].split()[4]))
-        if 'out of a maximum of 1' in lines[i]:
+        if 'out of a maximum of ' in lines[i]:
             stp = int(lines[i].split()[2])
             steps.append(stp)
         if 'ITU= ' in lines[i]:
