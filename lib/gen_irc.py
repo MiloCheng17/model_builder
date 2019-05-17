@@ -138,10 +138,12 @@ if __name__ == '__main__':
     parser.add_argument('-outf', dest='gau_out', default=None, help='output_name')
     parser.add_argument('-inpf', dest='gau_inp', default=None, help='input_name')
     parser.add_argument('-s', dest='scale', type=float,default=0.1, help='scale_factor')
+    parser.add_argument('-n', dest='num_freq', type=int,default=1, help='scale_factor')
 
     args = parser.parse_args()
     wdir = args.output_dir
     scale = args.scale
+    num_freq = args.num_freq
     dir1 = args.dir1
     dir2 = args.dir2
     if args.gau_out is None:
@@ -157,6 +159,6 @@ if __name__ == '__main__':
     opt, atom_idx, freq_xyz, freq_info, charge, multip, atom_name = get_gaussian_freq(out_f)
 #    print charge, multip
 
-    xyz = freq_xyz[1]
+    xyz = freq_xyz[num_freq]
     irc1, irc2 = form_irc_xyz(opt,atom_idx,xyz,scale)
     write_input(inp_f,'irc1','irc2',irc1,irc2,atom_name,charge,multip)
