@@ -41,6 +41,32 @@ def pdb_after_addh(tmppdb,newpdb):
                 pic_atom.append([line[0],line[1],line[2],line[3],line[4],line[5],line[6],line[7],line[8],line[9],line[10],line[11],line[12],line[13],line[14],line[15],line[16]])
     return pic_atom, tot_charge #, xyz, atom, hold
 
+### replace certain part of the pdb with provided pdb/xyz ###
+#def pdb_replace(tmppdb,newpdb,parts):
+#    tmp_pdb, res_info, tot_charge_t = read_pdb(tmppdb)
+#    tmp_xyz = []
+#    for i in tmp_pdb:
+#        tmp_xyz.append([i[8],i[9],i[10]])
+#    new_pdb, binfo, tot_charge = read_pdb(newpdb)     #can be just xyz files from cerius or pymol
+#    pic_atom = []
+#    for line in new_pdb:
+#        if [line[8],line[9],line[10]] not in tmp_xyz:
+#            line[15] = '0 '
+#            pic_atom.append([line[0],line[1],line[2],line[3],line[4],line[5],line[6],line[7],line[8],line[9],line[10],line[11],line[12],line[13],' H',line[15],line[16]])
+#        else:
+#            if '+' in line[15] or '-' in line[15]:
+#                charge = line[15]
+#            else:
+#                charge = '0 '
+#            idx = tmp_xyz.index([line[8],line[9],line[10]])
+#            line = tmp_pdb[idx]
+#            line[15] = charge
+#            if [line[2],line[5],line[6]] in res_info:
+#                pic_atom.append([line[0],line[1],line[2],line[3],line[4],line[5],line[6],line[7],line[8],line[9],line[10],line[11],line[12],line[13],line[14],line[15],'-1'])
+#            else:
+#                pic_atom.append([line[0],line[1],line[2],line[3],line[4],line[5],line[6],line[7],line[8],line[9],line[10],line[11],line[12],line[13],line[14],line[15],line[16]])
+#    return pic_atom, tot_charge #, xyz, atom, hold
+
 def write_input(inp_name,inp_temp,charge,multiplicity,pic_atom,tot_charge):
     ### inp_name default can be 1.inp, but first is name.input such as 9.input
     ### inp_type list which includes [small/large, level_theory, basis, opt, freq,  

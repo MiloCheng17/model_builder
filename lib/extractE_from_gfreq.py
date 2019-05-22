@@ -3,33 +3,93 @@
 import os, sys, re
 from numpy import *
 
-outf = sys.argv[1]
+#outf = sys.argv[1]
 
-scfe = []
+#scfe = []
 def read_gaussian_opt(gfile):
     with open(gfile) as f:
+        fline = f.read().replace('\n ','')
+    m = re.search('NImag=(\w+)',fline)
+    nimag = int(m.group(0).split('=')[-1])
+    m = re.search('NAtoms=(\s+)(\d+)',fline)
+    natoms = int(m.group(0).split('=')[-1])
+    m = re.search('NBasis=(\s+)(\d+)',fline)
+    nbasis = int(m.group(0).split('=')[-1])
+#    m = re.search("Zero-point correction=(\s+)(\d+).(\d+)",fline)
+#    l = m.groups()[1:]
+#    if len(l) == 2: 
+#        zero = float(l[0]+'.'+l[1])
+#    elif len(l) == 3:
+#        zero = float(l[0]+l[1]+'.'+l[2]) 
+#
+#    print zero
+##        if "Thermal correction to Energy=" in l:
+#    m = re.search("Thermal correction to Energy=(\s+)(\d+).(\d+)",fline)
+#    l = m.groups()[1:]
+#    if len(l) == 2: 
+#        ther = float(l[0]+'.'+l[1])
+#    elif len(l) == 3:
+#        ther = float(l[0]+l[1]+'.'+l[2]) 
+#    print ther
+##        if "Thermal correction to Enthalpy=" in l:
+#    m = re.search("Thermal correction to Enthalpy=(\s+)(\d+).(\d+)",fline)
+#    l = m.groups()[1:]
+#    if len(l) == 2: 
+#        he = float(l[0]+'.'+l[1])
+#    elif len(l) == 3:
+#        he = float(l[0]+l[1]+'.'+l[2]) 
+#    print he
+##        if "Thermal correction to Gibbs Free Energy=" in l:
+#    m = re.search("Thermal correction to Gibbs Free Energy=(\s+)(\d+).(\d+)",fline)
+#    l = m.groups()[1:]
+#    if len(l) == 2: 
+#        ge = float(l[0]+'.'+l[1])
+#    elif len(l) == 3:
+#        ge = float(l[0]+l[1]+'.'+l[2]) 
+#    print ge
+##        if "E (Thermal)             CV                S" in l:
+##    m = re.search("E (Thermal)             CV                S(\s+)?(\d+).(\d+)",fline)
+##    l = m.groups()[1:]
+##    if len(l) == 2: 
+##        se = float(l[0]+'.'+l[1])
+##    elif len(l) == 3:
+##        se = float(l[0]+l[1]+'.'+l[2]) 
+##        if "Sum of electronic and zero-point Energies" in l:
+#    m = re.search(r"Sum of electronic and zero-point Energies=(\s+)(\S)(\d+).(\d+)",fline)
+#    l = m.groups()[1:]
+#    if len(l) == 2: 
+#        szero = float(l[0]+'.'+l[1])
+#    elif len(l) == 3:
+#        szero = float(l[0]+l[1]+'.'+l[2]) 
+#    print szero
+##        if "Sum of electronic and thermal Energies" in l:
+#    m = re.search("Sum of electronic and thermal Energies=(\s+)(\S)(\d+).(\d+)",fline)
+#    l = m.groups()[1:]
+#    if len(l) == 2: 
+#        sele = float(l[0]+'.'+l[1])
+#    elif len(l) == 3:
+#        sele = float(l[0]+l[1]+'.'+l[2]) 
+##        if "Sum of electronic and thermal Enthalpies" in l:
+#    m = re.search("Sum of electronic and thermal Enthalpies=(\s+)(\S)(\d+).(\d+)",fline)
+#    l = m.groups()[1:]
+#    if len(l) == 2: 
+#        enthalpy = float(l[0]+'.'+l[1])
+#    elif len(l) == 3:
+#        enthalpy = float(l[0]+l[1]+'.'+l[2]) 
+##        if "Sum of electronic and thermal Free Energies" in l:
+#    m = re.search("Sum of electronic and thermal Free Energies=(\s+)(\S)(\d+).(\d+)",fline)
+#    l = m.groups()[1:]
+#    if len(l) == 2: 
+#        freeg = float(l[0]+'.'+l[1])
+#    elif len(l) == 3:
+#        freeg = float(l[0]+l[1]+'.'+l[2]) 
+        
+
+    scfe = []
+    with open(gfile) as f:
         lines = f.readlines()
-    natoms = 0
-    nimag = 0
     for i in range(len(lines)):
         l = lines[i]
-        if "Standard orientation:" in l:
-            for j in range(5,1000):
-                if len(lines[i+j].split()) == 6:
-                    natoms += 1
-                if "----" in lines[i+j]:
-                    break
-        if "NBasis" in l:
-            nbasis = int( l.split()[1] )
-            break
-    for i in range(len(lines)):
-        l = lines[i]
-        if "NImag" in l and len(l.split('NImag')[1].split('\\')[0].split()) >= 1 and "NImag" not in l[-7:]:
-            nimag = int( l.split('NImag')[1].split('\\')[0][1:] )
-        elif "NImag" in l[-7:]:
-            nimag = int( lines[i+1].split('\\')[0][-1] )
-        if "NBasis" in l:
-            nbasis = int( l.split()[1] )
         if "SCF Done" in l:
             scfe.append(float(l.split()[4]))
         #Zero-point correction=                           2.285998 (Hartree/Particle)
@@ -71,6 +131,7 @@ if __name__ ==  '__main__':
 ### or  Usage: Program output 2 #### (print out my numbers)
 #########################################################################
 
+    outf = sys.argv[1]
     scfe, zero, ther, he, ge, se, szero, sele, enthalpy, freeg, nimag, nbasis, natoms = read_gaussian_opt(outf)
     if len(sys.argv) == 2:
         print "%-50s %30.6f"%("SCFDone:E(RB3LYP)= ",scfe)
