@@ -4,7 +4,6 @@ from rms import *
 from numpy import *
 import sys, re, os
 from read_write_pdb import *
-import argparse
 
 def system_run(cmd):
     print cmd
@@ -36,33 +35,16 @@ def read_gaussian_opt(gfile,natoms,step):
     return opt
 
 if __name__ == '__main__':
-    """ Usage: gopt_to_pdb.py -o ../1.out -s -1 -p ../template.pdb """
-    parser = argparse.ArgumentParser(description='generate pdbfiles from 1.out')
-    parser.add_argument('-f', dest='frame',default=None,help='select frame/range')
-    parser.add_argument('-o', dest='outputs',default='1.out',help='output files')
-    parser.add_argument('-s', dest='start',default=0,type=int,help='output steps')
-    parser.add_argument('-p', dest='pdbf',default='template.pdb',help='template pdb file')
-
-    args = parser.parse_args()
+    pdbf = sys.argv[1]
     steps = []
     files = []
-    if ',' in args.outputs:
-        files = args.outputs.split(',')
-        steps = args.start.split(',')
-    else:
-        files = [args.outputs]
-        steps = [args.start]
-    pdbf = args.pdbf
-#    pdbf = sys.argv[1]
-#    steps = []
-#    files = []
-#    for i in range(2,len(sys.argv),2):
-#        files.append(sys.argv[i])
-#        steps.append(int(sys.argv[i+1]))
+    for i in range(2,len(sys.argv),2):
+        files.append(sys.argv[i])
+        steps.append(int(sys.argv[i+1]))
 
     pdb, res_info, tot_charge = read_pdb(pdbf)
     map, xyz_i = get_ca(pdb)
-    
+
     natoms = len(pdb)
     rot_opt = {}
     count = 0
@@ -79,22 +61,10 @@ if __name__ == '__main__':
         for key in sorted(opt.keys()):
             if key not in rot_opt.keys():
                 rot_opt[key] = opt[key]
-    if args.frame is None:
-        for key in sorted(rot_opt.keys()):
-            xyz_c = rot_opt[key]
-            (c_trans,U,ref_trans) = rms_fit(xyz_i,xyz_c[map])
-            xyz_n = dot( xyz_c-c_trans, U ) + ref_trans
-            sel_atom = update_xyz(pdb,xyz_n)
-            name = str(key)+'.pdb'
-            write_pdb(name,sel_atom)
-    elif args.frame == '-1':
-        key = sorted(rot_opt.keys())[-1]
+    for key in sorted(rot_opt.keys()):
         xyz_c = rot_opt[key]
         (c_trans,U,ref_trans) = rms_fit(xyz_i,xyz_c[map])
         xyz_n = dot( xyz_c-c_trans, U ) + ref_trans
         sel_atom = update_xyz(pdb,xyz_n)
         name = str(key)+'.pdb'
         write_pdb(name,sel_atom)
-    else:
-        print "The frame is not clear!"
-        sys.exit()

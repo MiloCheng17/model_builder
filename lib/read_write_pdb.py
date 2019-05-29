@@ -99,7 +99,7 @@ def write_pdb(filename,pdb,renum_atom=True,hydrogen=True,renum_res=False):
                 serial_res += 1
                 prev_res = p[6]
             t = t[0:6]+[serial_res]+t[7:17]
-        f.write('%6s%5d %4s%1s%3s %1s%4d%1s   %8.3f%8.3f%8.3f%6.2f%6.2f      %-4s%2s%2s%6s\n'%tuple(t))
+        f.write('%6s%5d %4s%1s%3s %1s%4d%1s   %8.3f%8.3f%8.3f%6.2f%6.2f      %-4s%2s%2s%7s\n'%tuple(t))
     if ( file_opened ):
         f.close()
 
