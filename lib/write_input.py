@@ -41,22 +41,26 @@ def pdb_after_addh(tmppdb,newpdb):
                 pic_atom.append([line[0],line[1],line[2],line[3],line[4],line[5],line[6],line[7],line[8],line[9],line[10],line[11],line[12],line[13],line[14],line[15],line[16]])
     return pic_atom, tot_charge #, xyz, atom, hold
 
+########################################################################
 ### replace certain part of the pdb with provided pdb/xyz ##############
 ### tmppdb is the minimized structure, most of these xyz will be kept
 ### newpdb is the one contain transition structure/fragment
 ### parts is the residue name and atom name for the transition part
+########################################################################
 def pdb_replace(tmppdb,newpdb,parts):
     tmp_pdb, res_info, tot_charge_t = read_pdb(tmppdb)
     tmp_xyz = []
+    new_xyz = []
     for i in tmp_pdb:
-        tmp_xyz.append([i[4],i[2]])
+        tmp_xyz.append([i[4].strip(),i[2].strip()])
     new_pdb, binfo, tot_charge = read_pdb(newpdb)     #can be just xyz files from cerius or pymol
     for i in new_pdb:
-        new_xyz.append([i[4],i[2]])
+        new_xyz.append([i[4].strip(),i[2].strip()])
+    print new_xyz[0]
 
     if parts == None:   #newpdb has the entire thing to replace the tmppdb
         for line in new_pdb:
-            resatom = [line[4],line[2]]
+            resatom = [line[4].strip(),line[2].strip()]
             idx = tmp_xyz.index(resatom)
             tmp_pdb[idx] = line
     else:
@@ -224,13 +228,12 @@ if __name__ == '__main__':
     if step == 0:
         pic_atom, tot_charge = pdb_after_addh(nohpdb,adhpdb)
         write_pdb('%s'%tmp_pdb,pic_atom)
-    else:
+    elif step == 1:
         i_name = []
         for gau_input in glob('%s/*inp'%wdir):
             m = re.search(r'-(\d+)-inp', gau_input)
             if m:
                 i_name.append( int(m.group(1)) )
-        print len(i_name)
         if len(i_name) == 0:
             i_step = 1
             if os.path.isfile('%s/1.out'%wdir):
@@ -254,19 +257,19 @@ if __name__ == '__main__':
         if step == 1:
             pdb_file, new_dir = gen_pdbfiles(wdir,i_step,tmp_pdb)
             pic_atom, res_info, tot_charge = read_pdb('%s/%s.pdb'%(new_dir,pdb_file))
-        elif step == 2:
-            newpdb = args.new_pdb
-            pic_atom, res_info, tot_charge = read_pdb(newpdb)
-#        elif step == 3:
-#            pdb1 = args.pdb_1
-#            pdb2 = args.pdb_2
-#            if args.parts != None:
-#                part = args.parts
-#                print part, len(part)
-#                for i in range(0,len(args.parts)/2,2):
-#                parts.append([args.parts[i][0],args.parts[i][1]])
-#            else:
-#                parts = None
-#            pic_atom, tot_charge = pdb_replace(pdb1,pdb2,parts)    
+    elif step == 2:
+        newpdb = args.new_pdb
+        pic_atom, res_info, tot_charge = read_pdb(newpdb)
+    elif step == 3:
+        pdb1 = args.pdb1
+        pdb2 = args.pdb2
+        parts = args.parts
+        if parts != None:
+           with open(parts) as f:
+               plines = f.readlines()
+           parts = []
+           for line in plines:
+               parts.append(line.split())
+        pic_atom, tot_charge = pdb_replace(pdb1,pdb2,parts)    
     write_input('%s/%s'%(wdir,inp_name),int_tmp,charge,multi,pic_atom,tot_charge)
         
