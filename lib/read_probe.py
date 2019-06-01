@@ -1,5 +1,9 @@
 ### Date: Feb. 21 2019        ###
 ### Version 1 (trial on COMT) ###
+"""
+This is a program written by Qianyi Cheng in DeYonker Research Group
+at University of Memphis.
+"""
 
 
 import sys, os

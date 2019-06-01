@@ -1,4 +1,8 @@
 #!/usr/bin/env python
+"""
+This is a program written by Qianyi Cheng in DeYonker Research Group
+at University of Memphis.
+"""
 
 ###  launches PyMol for stereo viewing on a VisBox. It runs PyMol fullscreen stereo, and disables the internal gui. The environment (PYTHON_PATH and PYMOL_PATH) must already be set up
 

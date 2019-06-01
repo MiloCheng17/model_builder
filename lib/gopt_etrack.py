@@ -1,4 +1,8 @@
 #!/usr/bin/env python
+"""
+This is a program written by Qianyi Cheng in DeYonker Research Group
+at University of Memphis.
+"""
 
 from numpy import *
 import sys, re, os

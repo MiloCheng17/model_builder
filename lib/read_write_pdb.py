@@ -1,4 +1,8 @@
 from numpy import *
+"""
+This is a program written by Qianyi Cheng in DeYonker Research Group
+at University of Memphis.
+"""
 
 def read_pdb(pdbfile,TER=False):
     f = open(pdbfile,'r')

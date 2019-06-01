@@ -1,4 +1,9 @@
 #!/usr/bin/env python
+"""
+This is a program written by Qianyi Cheng in DeYonker Research Group
+at University of Memphis.
+"""
+
 
 from read_write_pdb import *
 from rms import *
